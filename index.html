@@ -2922,11 +2922,37 @@
         function showEasyTestQuestion() {
             if (currentEasyTestIndex >= easyTestWords.length) {
                 let correct = 0;
+                let wrongAnswers = [];
+                
                 userAnswers.forEach((answer, idx) => {
                     if (answer === easyTestWords[idx].meaning) {
                         correct++;
+                    } else {
+                        wrongAnswers.push({
+                            word: easyTestWords[idx].word,
+                            userAnswer: answer,
+                            correctAnswer: easyTestWords[idx].meaning,
+                            example: easyTestWords[idx].example
+                        });
                     }
                 });
+                
+                let wrongAnswersHTML = '';
+                if (wrongAnswers.length > 0) {
+                    wrongAnswersHTML = `
+                        <div style="margin-top: 30px; text-align: left; background: #fff3cd; border-radius: 10px; padding: 20px;">
+                            <h3 style="color: #856404; margin-bottom: 15px;">틀린 문제 분석</h3>
+                            ${wrongAnswers.map((item, idx) => `
+                                <div style="margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                    <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${idx + 1}. ${item.word}</div>
+                                    <div style="color: #666; font-size: 14px; margin-bottom: 8px;">${item.example}</div>
+                                    <div style="color: #e74c3c; margin-bottom: 5px;">❌ 선택한 답: ${item.userAnswer}</div>
+                                    <div style="color: #27ae60;">✅ 정답: ${item.correctAnswer}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
                 
                 document.getElementById('test-area').innerHTML = `
                     <div class="test-complete">
@@ -2934,6 +2960,7 @@
                         <h2>간이 테스트 완료!</h2>
                         <p style="font-size: 24px; margin: 20px 0;">점수: ${correct}/10</p>
                         <p>10개 중 ${correct}개를 맞추셨습니다!</p>
+                        ${wrongAnswersHTML}
                         <button class="start-btn" onclick="startEasyTest()">다시 테스트하기</button>
                     </div>
                 `;
